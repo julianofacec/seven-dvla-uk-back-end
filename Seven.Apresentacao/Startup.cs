@@ -1,21 +1,18 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Seven.Apresentacao
 {
     public class Startup
     {
+        private const string _nomeEmpresa = "Seven";
+        private const string _nomeApi = "DVLA UK";
+        private const string _versaoApi = "v1";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,7 +27,7 @@ namespace Seven.Apresentacao
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Seven.Apresentacao", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = string.Concat(_nomeEmpresa, " ", _nomeApi), Version = _versaoApi });
             });
         }
 
@@ -41,7 +38,7 @@ namespace Seven.Apresentacao
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Seven.Apresentacao v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", string.Concat(_nomeEmpresa, " ", _nomeApi, " ", _versaoApi)));
             }
 
             app.UseHttpsRedirection();
