@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
@@ -14,17 +16,6 @@ namespace Seven.Apresentacao
 {
     public class Startup
     {
-        private const string _swaggerVersion = "v1";
-        private const string _companyName = "Seven";
-        private const string _swaggerEndPoint = "/swagger/v1/swagger.json";
-        private const string _apiName = "Seven DVLA API V1";
-
-        private readonly OpenApiInfo _openApiInfo = new OpenApiInfo()
-        {
-            Title = _companyName,
-            Version = _swaggerVersion,
-        };
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -35,9 +26,12 @@ namespace Seven.Apresentacao
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
+
             services.AddControllers();
-            services.AddSwaggerGen(x => x.SwaggerDoc(_swaggerVersion, _openApiInfo));
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Seven.Apresentacao", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,32 +40,19 @@ namespace Seven.Apresentacao
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Seven.Apresentacao v1"));
             }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-
-            app.UseSwagger();
-            app.UseSwaggerUI(x =>
-            {
-                x.RoutePrefix = string.Empty;
-                x.SwaggerEndpoint(_swaggerEndPoint, _apiName);
-            });
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthorization();
 
-            app.UseEndpoints(x =>
+            app.UseEndpoints(endpoints =>
             {
-                x.MapRazorPages();
-                x.MapControllers();
+                endpoints.MapControllers();
             });
         }
     }
